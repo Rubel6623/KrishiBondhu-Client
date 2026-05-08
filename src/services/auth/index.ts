@@ -2,9 +2,17 @@
 
 import { jwtDecode } from "jwt-decode";
 import { cookies } from "next/headers";
-import { FieldValues } from "react-hook-form";
 
-export const registerUser = async (userData: FieldValues) => {
+interface CustomJwtPayload {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  exp?: number;
+  iat?: number;
+}
+
+export const registerUser = async (userData: any) => {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/auth/register`, {
       method: "POST",
@@ -13,26 +21,17 @@ export const registerUser = async (userData: FieldValues) => {
       },
       body: JSON.stringify(userData),
     });
-    
-    const text = await res.text();
-    try {
-      return JSON.parse(text);
-    } catch (e) {
-      console.error("Non-JSON response from server:", text);
-      return {
-        success: false,
-        message: "Server is currently unavailable or returning an invalid response. Please try again later."
-      };
-    }
+
+    return await res.json();
   } catch (error: any) {
     return {
       success: false,
-      message: error.message || "An unexpected error occurred"
+      message: error.message || "An unexpected error occurred",
     };
   }
 };
 
-export const loginUser = async (userData: FieldValues) => {
+export const loginUser = async (userData: any) => {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/auth/login`, {
       method: "POST",
@@ -42,28 +41,17 @@ export const loginUser = async (userData: FieldValues) => {
       body: JSON.stringify(userData),
     });
 
-    const text = await res.text();
-    let result;
-    try {
-      result = JSON.parse(text);
-    } catch (e) {
-      console.error("Non-JSON response from login server:", text);
-      return {
-        success: false,
-        message: `Authentication server error (${res.status}). Please check your connection or try again later.`
-      };
-    }
-
-    const storeCookie = await cookies();
+    const result = await res.json();
 
     if (result.success) {
+      const storeCookie = await cookies();
       storeCookie.set("token", result?.data?.token);
     }
     return result;
-  } catch (error) {
+  } catch (error: any) {
     return {
       success: false,
-      message: (error as Error).message || "An unexpected error occurred"
+      message: error.message || "An unexpected error occurred",
     };
   }
 };
@@ -78,55 +66,38 @@ export const socialLogin = async (userData: { email: string; name: string; avata
       body: JSON.stringify(userData),
     });
 
-    const text = await res.text();
-    let result;
-    try {
-      result = JSON.parse(text);
-    } catch (e) {
-      console.error("Non-JSON response from social login server:", text);
-      return {
-        success: false,
-        message: `Social Authentication server error (${res.status}). The requested endpoint might be missing or unavailable on production.`
-      };
-    }
-
-    const storeCookie = await cookies();
+    const result = await res.json();
 
     if (result.success) {
+      const storeCookie = await cookies();
       storeCookie.set("token", result?.data?.token);
     }
     return result;
-  } catch (error) {
+  } catch (error: any) {
     return {
       success: false,
-      message: (error as Error).message || "An unexpected error occurred",
+      message: error.message || "An unexpected error occurred",
     };
   }
 };
 
-interface CustomJwtPayload {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  status: string;
-  exp?: number;
-  iat?: number;
-}
-
 export const getUser = async () => {
   const storeCookie = await cookies();
   const token = storeCookie.get("token")?.value;
-  let decodedData: CustomJwtPayload | null = null;
+
   if (token) {
-    decodedData = jwtDecode<CustomJwtPayload>(token);
-    
-    // Check if token has expired
-    if (decodedData.exp && decodedData.exp < Date.now() / 1000) {
+    try {
+      const decodedData = jwtDecode<CustomJwtPayload>(token);
+
+      // Check if token has expired
+      if (decodedData.exp && decodedData.exp < Date.now() / 1000) {
+        return null;
+      }
+
+      return decodedData;
+    } catch (error) {
       return null;
     }
-    
-    return decodedData;
   } else {
     return null;
   }
@@ -140,26 +111,11 @@ export const getMe = async () => {
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/auth/me`, {
       method: "GET",
       headers: {
-        "Authorization": `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
     });
 
-    if (!res.ok) {
-        const text = await res.text();
-        console.error("Get profile failed:", text);
-        try {
-            const errorData = JSON.parse(text);
-            return errorData;
-        } catch(e) {
-            return {
-                success: false,
-                message: `Server returned ${res.status}: ${text.slice(0, 100)}`
-            };
-        }
-    }
-
     return await res.json();
-
   } catch (error: any) {
     return {
       success: false,
@@ -176,28 +132,13 @@ export const updateProfile = async (data: any) => {
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/auth/me`, {
       method: "PUT",
       headers: {
-        "Authorization": `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
     });
 
-    if (!res.ok) {
-        const text = await res.text();
-        console.error("Profile update failed:", text);
-        try {
-            const errorData = JSON.parse(text);
-            return errorData;
-        } catch(e) {
-            return {
-                success: false,
-                message: `Server returned ${res.status}: ${text.slice(0, 100)}`
-            };
-        }
-    }
-
     return await res.json();
-
   } catch (error: any) {
     return {
       success: false,
@@ -207,7 +148,6 @@ export const updateProfile = async (data: any) => {
 };
 
 export const UserLogOut = async () => {
-
   const storeCookie = await cookies();
   storeCookie.delete("token");
 };
