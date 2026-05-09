@@ -5,9 +5,10 @@ import { cookies } from "next/headers";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
-export const getAllEquipment = async () => {
+export const getAllEquipment = async (query?: Record<string, any>) => {
+  const params = new URLSearchParams(query);
   try {
-    const res = await fetch(`${BASE_URL}/equipment`, {
+    const res = await fetch(`${BASE_URL}/equipment?${params.toString()}`, {
       method: "GET",
       next: { tags: ["equipment"] },
     });
@@ -55,6 +56,33 @@ export const getSingleEquipment = async (id: string) => {
     return {
       success: false,
       message: error.message || "Failed to fetch equipment details",
+    };
+  }
+};
+
+export const createEquipment = async (data: any) => {
+  const storeCookie = await cookies();
+  const token = storeCookie.get("token")?.value;
+
+  try {
+    const res = await fetch(`${BASE_URL}/equipment`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    });
+
+    const result = await res.json();
+    if (result.success) {
+      (revalidateTag as any)("equipment");
+    }
+    return result;
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error.message || "Failed to create equipment",
     };
   }
 };

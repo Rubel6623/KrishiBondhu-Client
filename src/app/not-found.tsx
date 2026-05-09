@@ -3,13 +3,10 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Tractor, Home, ArrowLeft, Search } from "lucide-react";
-import Navbar from "@/components/shared/Navbar";
-import Footer from "@/components/shared/Footer";
 
 export default function NotFound() {
   return (
     <div className="min-h-screen flex flex-col bg-background selection:bg-green-brand/20">
-      <Navbar />
       
       <main className="flex-1 flex items-center justify-center relative overflow-hidden" style={{ paddingTop: "var(--nav-h)" }}>
         {/* Decorative Background Elements */}
@@ -77,8 +74,6 @@ export default function NotFound() {
           </motion.div>
         </div>
       </main>
-
-      <Footer />
     </div>
   );
 }

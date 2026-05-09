@@ -77,7 +77,7 @@ export default function SpecialistsSection() {
               viewport={{ once: true }}
               className="text-4xl md:text-6xl font-serif font-black text-foreground leading-tight"
             >
-              VETERINARIAN <span className="text-green-brand italic font-normal">বা</span> <br />
+              VETERINARIAN <br />
               <span className="text-green-deep dark:text-green-light">SPECIALIST</span> <em className="italic text-gold not-italic">Consultation</em>
             </motion.h2>
             <p className="mt-6 text-lg text-muted-foreground font-medium max-w-lg">
