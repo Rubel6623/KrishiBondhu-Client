@@ -1,6 +1,7 @@
 import { DM_Sans, Fraunces, Hind_Siliguri } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "../components/theme-provider";
+import { Toaster } from "sonner";
 import type { Metadata } from "next";
 
 const dmSans = DM_Sans({
@@ -46,7 +47,7 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${dmSans.variable} ${fraunces.variable} ${hindSiliguri.variable}`}
     >
-      <body>
+      <body suppressHydrationWarning>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -54,6 +55,7 @@ export default function RootLayout({
           disableTransitionOnChange={false}
         >
           {children}
+          <Toaster position="top-right" richColors closeButton />
         </ThemeProvider>
       </body>
     </html>

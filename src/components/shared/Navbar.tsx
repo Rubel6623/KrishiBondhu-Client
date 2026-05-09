@@ -84,6 +84,11 @@ export const Navbar = () => {
       href: "/providers",
     },
     {
+      title: "Pricing",
+      description: "Transparent plans for farmers and providers",
+      href: "/pricing",
+    },
+    {
       title: "About Us",
       description: "Our mission to support farmers across the nation",
       href: "/about",
@@ -116,7 +121,7 @@ export const Navbar = () => {
               <NavigationMenuItem>
                 <NavigationMenuTrigger className="bg-transparent text-foreground hover:text-green-600 transition-colors">Explore</NavigationMenuTrigger>
                 <NavigationMenuContent>
-                  <div className="border-border bg-background shadow-2xl grid w-[600px] grid-cols-2 p-3 border rounded-xl">
+                  <div className="border-border bg-background shadow-2xl p-3 border rounded-xl">
                     {features.map((feature, index) => (
                       <NavigationMenuLink
                         asChild
@@ -126,9 +131,6 @@ export const Navbar = () => {
                         <Link href={feature.href}>
                           <p className="mb-1 font-semibold text-foreground group-hover:text-green-600">
                             {feature.title}
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            {feature.description}
                           </p>
                         </Link>
                       </NavigationMenuLink>
@@ -169,7 +171,7 @@ export const Navbar = () => {
               <NavigationMenuItem>
                 <NavigationMenuLink asChild>
                   <Link
-                    href="/contact"
+                    href="/contact-us"
                     className={`${navigationMenuTriggerStyle()} bg-transparent text-foreground hover:text-green-600 transition-colors`}
                   >
                     Contact
@@ -316,7 +318,7 @@ export const Navbar = () => {
                     </Link>
                   </SheetClose>
                   <SheetClose asChild>
-                    <Link href="/contact" className="text-lg font-medium text-foreground hover:text-green-600 transition-colors">
+                    <Link href="/contact-us" className="text-lg font-medium text-foreground hover:text-green-600 transition-colors">
                       Contact
                     </Link>
                   </SheetClose>

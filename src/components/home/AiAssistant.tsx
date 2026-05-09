@@ -1,5 +1,6 @@
 import { Leaf, Calendar, Quote } from "lucide-react";
 import SectionBackground from "./SectionBackground";
+import { AIFarmingAdvisor } from "@/components/AI_Features/KrishiBondhuChat";
 
 export default function AiAssistant() {
   const features = [
@@ -13,25 +14,8 @@ export default function AiAssistant() {
       <SectionBackground />
       <div className="max-w-[1280px] mx-auto relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-[60px] items-center mt-14">
-          <div className="bg-green-deep/90 dark:bg-black/20 backdrop-blur-md rounded-[32px] p-8 border border-white/10 relative overflow-hidden shadow-2xl">
-            <div className="flex items-center gap-3 mb-8 pb-5 border-b border-white/8">
-              <div className="w-10 h-10 rounded-full bg-green-brand flex items-center justify-center text-[20px]">🤖</div>
-              <div>
-                <div className="text-[15px] font-semibold text-white">KrishiAI Assistant</div>
-                <div className="text-[11px] text-green-light">● Online · Responding in Bangla & English</div>
-              </div>
-            </div>
-            <div className="flex flex-col gap-4">
-              <div className="max-w-[85%] px-4.5 py-3.5 rounded-[18px] text-[13px] leading-relaxed bg-green-brand text-white self-end rounded-br-none shadow-sm">আমার ধানের পাতায় হলুদ দাগ দেখা যাচ্ছে। কী করব?</div>
-              <div className="max-w-[85%] px-4.5 py-3.5 rounded-[18px] text-[13px] leading-relaxed bg-white/8 text-white/85 rounded-bl-none">আপনার ধানের পাতায় হলুদ দাগ দেখে মনে হচ্ছে এটি <strong>নাইট্রোজেনের ঘাটতি</strong> বা <strong>ব্যাকটেরিয়াল লিফ ব্লাইট</strong> হতে পারে। আমি আপনার কাছাকাছি ৩টি কৃষি বিশেষজ্ঞ খুঁজে পেয়েছি। সঠিক সমাধানের জন্য ছবি আপলোড করুন।</div>
-              <div className="max-w-[85%] px-4.5 py-3.5 rounded-[18px] text-[13px] leading-relaxed bg-green-brand text-white self-end rounded-br-none shadow-sm">Recommend best equipment for next season rice harvest</div>
-              <div className="max-w-[85%] px-4.5 py-3.5 rounded-[18px] text-[13px] leading-relaxed bg-white/8 text-white/85 rounded-bl-none">Based on your farm in Rajshahi and 2.5 acre field size, I recommend the <strong>Kubota DC-70 Combine Harvester</strong>. Available for ৳3,200/day from 3 verified providers within 15km.</div>
-              <div className="flex gap-1.5 px-4.5 py-4 bg-white/6 rounded-[18px] w-[65px] rounded-bl-none">
-                <div className="w-1.5 h-1.5 rounded-full bg-white/30 animate-[typingBounce_1.4s_infinite]" />
-                <div className="w-1.5 h-1.5 rounded-full bg-white/30 animate-[typingBounce_1.4s_infinite_0.2s]" />
-                <div className="w-1.5 h-1.5 rounded-full bg-white/30 animate-[typingBounce_1.4s_infinite_0.4s]" />
-              </div>
-            </div>
+          <div className="animate-in fade-in slide-in-from-left duration-1000">
+             <AIFarmingAdvisor />
           </div>
           <div>
             <div className="inline-flex items-center gap-2 text-[11px] font-semibold tracking-[2px] uppercase text-green-brand dark:text-green-light mb-4 before:content-[''] before:block before:w-6 before:h-0.5 before:bg-green-brand dark:before:bg-green-light before:rounded-sm">AI-Powered Features</div>

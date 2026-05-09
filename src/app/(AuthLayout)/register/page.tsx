@@ -19,7 +19,7 @@ const registerSchema = z.object({
   email: z.string().email("Invalid email address"),
   phone: z.string().min(10, "Phone number must be at least 10 digits"),
   password: z.string().min(6, "Password must be at least 6 characters"),
-  role: z.enum(["FARMER", "PROVIDER"]),
+  role: z.enum(["FARMER", "PROVIDER", "VETERINARIAN"]),
   location: z.string().min(3, "Location is required"),
 });
 
@@ -46,10 +46,14 @@ export default function RegisterPage() {
     try {
       const result = await registerUser(data);
       if (result.success) {
-        toast.success("Account created successfully! Please login.");
+        toast.success("Account created successfully!", {
+          description: "You can now log in with your new credentials.",
+        });
         router.push("/login");
       } else {
-        toast.error(result.message || "Registration failed");
+        toast.error(result.message || "Registration failed", {
+          description: "Please check your details and try again.",
+        });
       }
     } catch (error) {
       toast.error("Something went wrong. Please try again.");
@@ -148,6 +152,7 @@ export default function RegisterPage() {
                 >
                   <option value="FARMER">Farmer</option>
                   <option value="PROVIDER">Equipment Provider</option>
+                  <option value="VETERINARIAN">Veterinarian/Specialist</option>
                 </Select>
                 {errors.role && <p className="text-xs text-destructive">{errors.role.message}</p>}
               </div>

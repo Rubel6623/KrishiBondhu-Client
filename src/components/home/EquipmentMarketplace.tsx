@@ -42,7 +42,7 @@ export default function EquipmentMarketplace() {
             ))}
           </div>
           
-          <div className="bg-white/80 dark:bg-card-bg backdrop-blur-md rounded-[24px] p-8 border border-black/6 dark:border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.06)]">
+          <div className="bg-white/10 dark:bg-card-bg backdrop-blur-md rounded-[24px] p-8 border border-black/6 dark:border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.06)]">
             <div className="w-full h-[220px] bg-green-pale dark:bg-green-deep/40 rounded-2xl mb-6 flex items-center justify-center text-[80px]">{equipment[activeEq].emoji}</div>
             <div className="font-serif text-[28px] font-bold text-green-deep dark:text-white mb-2">{equipment[activeEq].name}</div>
             <div className="text-[13px] text-text-muted flex items-center gap-1.5 mb-4">

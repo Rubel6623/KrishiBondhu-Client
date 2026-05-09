@@ -37,12 +37,17 @@ export default function LoginPage() {
     try {
       const result = await loginUser(data);
       if (result.success) {
-        toast.success("Welcome back to KrishiBondhu!");
-        // Refresh to update server components that depend on the auth cookie
-        router.push("/");
+        toast.success("Welcome back to KrishiBondhu!", {
+          description: "Logged in successfully.",
+        });
+        
+        const role = result?.data?.user?.role?.toLowerCase() || "farmer";
+        router.push(`/dashboard/${role}`);
         router.refresh();
       } else {
-        toast.error(result.message || "Login failed. Please check your credentials.");
+        toast.error(result.message || "Login failed", {
+          description: "Please check your credentials and try again.",
+        });
       }
     } catch (error) {
       toast.error("Something went wrong. Please try again.");

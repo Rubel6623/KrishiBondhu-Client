@@ -78,7 +78,8 @@ const Footer = () => {
               { name: "All Services", href: "/services" },
               { name: "AI Crop Assistant", href: "/ai/crop-assistant" },
               { name: "Knowledge Hub", href: "/blog" },
-              { name: "About Us", href: "/about" }
+              { name: "About Us", href: "/about" },
+              { name: "Contact Us", href: "/contact-us" }
             ].map((link, i) => (
               <li key={i}>
                 <Link href={link.href} className="text-sm text-gray-400 hover:text-[var(--green-bright)] hover:translate-x-1 transition-all inline-block">
