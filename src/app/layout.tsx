@@ -1,32 +1,63 @@
-import { Geist, Geist_Mono, Roboto, Public_Sans } from "next/font/google"
+import { DM_Sans, Fraunces, Hind_Siliguri } from "next/font/google";
+import "./globals.css";
+import { ThemeProvider } from "../components/theme-provider";
+import type { Metadata } from "next";
 
-import "./globals.css"
-import { ThemeProvider } from "@/components/theme-provider"
-import { cn } from "@/lib/utils";
-
-const publicSansHeading = Public_Sans({subsets:['latin'],variable:'--font-heading'});
-
-const roboto = Roboto({subsets:['latin'],variable:'--font-sans'})
-
-const fontMono = Geist_Mono({
+const dmSans = DM_Sans({
   subsets: ["latin"],
-  variable: "--font-mono",
-})
+  weight: ["300", "400", "500", "600"],
+  variable: "--font-sans",
+  display: "swap",
+});
+
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  weight: ["400", "600", "700", "900"],
+  style: ["normal", "italic"],
+  variable: "--font-serif",
+  display: "swap",
+});
+
+const hindSiliguri = Hind_Siliguri({
+  subsets: ["latin", "bengali"],
+  weight: ["400", "500", "600"],
+  variable: "--font-bangla",
+  display: "swap",
+});
+
+export const metadata: Metadata = {
+  title: {
+    default: "KrishiBondhu — কৃষকের সাথে, উন্নতির পথে",
+    template: "%s — KrishiBondhu",
+  },
+  description:
+    "Bangladesh's #1 AgriTech Platform. Rent agricultural equipment, connect with trusted providers, and grow your farm with AI-powered insights.",
+  keywords: ["agriculture", "Bangladesh", "equipment rental", "farming", "কৃষি"],
+};
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
   return (
     <html
       lang="en"
       suppressHydrationWarning
-      className={cn("antialiased", fontMono.variable, "font-sans", roboto.variable, publicSansHeading.variable)}
+      className={`${dmSans.variable} ${fraunces.variable} ${hindSiliguri.variable}`}
     >
       <body>
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange={false}
+        >
+          {children}
+        </ThemeProvider>
       </body>
     </html>
-  )
+  );
 }
+
+// remake hero section with proper background color (remind theme provider)
