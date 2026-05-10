@@ -1,5 +1,9 @@
 # KrishiBondhu Client
 
+## Live Deployment
+- **Live App:** [https://krishi-bondhu-client-lf3r9s5l4-rubel6623s-projects.vercel.app](https://krishi-bondhu-client-lf3r9s5l4-rubel6623s-projects.vercel.app)
+- **API Server:** [https://krishibondhu-server.onrender.com](https://krishibondhu-server.onrender.com)
+
 ## Project Overview
 KrishiBondhu is a comprehensive platform designed to bridge the gap between farmers, veterinarians, and service providers. It offers an intuitive interface for managing consultations, real-time chat, an equipment marketplace, and AI-powered assistance for farming insights. The client application provides tailored, modern dashboards with a focus on seamless user experience for Farmers, Veterinarians, and Providers.
 
