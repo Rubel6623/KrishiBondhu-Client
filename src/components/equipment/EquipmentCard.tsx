@@ -7,8 +7,8 @@ import { MapPin, Star, Zap, Info } from "lucide-react";
 interface EquipmentCardProps {
   item: {
     id: string;
-    name: string;
-    pricePerDay: number;
+    title: string;
+    price: number;
     location: string;
     images: string[];
     category: { name: string };
@@ -25,7 +25,7 @@ export default function EquipmentCard({ item }: EquipmentCardProps) {
       <div className="relative h-[240px] overflow-hidden">
         <Image
           src={item.images?.[0] || "https://images.unsplash.com/photo-1593110050241-ee7ce35e9701?auto=format&fit=crop&q=80&w=800"}
-          alt={item.name}
+          alt={item.title}
           fill
           className="object-cover transition-transform duration-700 group-hover:scale-110"
         />
@@ -41,7 +41,7 @@ export default function EquipmentCard({ item }: EquipmentCardProps) {
         {/* Price Tag */}
         <div className="absolute bottom-4 right-4">
           <div className="bg-green-brand text-white px-5 py-2 rounded-2xl font-bold shadow-lg">
-            ৳{item.pricePerDay}
+            ৳{item.price}
             <span className="text-[10px] font-normal opacity-80 block leading-tight">per day</span>
           </div>
         </div>
@@ -51,7 +51,7 @@ export default function EquipmentCard({ item }: EquipmentCardProps) {
       <div className="p-6">
         <div className="flex justify-between items-start mb-3">
           <h3 className="font-serif text-xl font-bold text-green-deep dark:text-white line-clamp-1 group-hover:text-green-brand transition-colors">
-            {item.name}
+            {item.title}
           </h3>
         </div>
 

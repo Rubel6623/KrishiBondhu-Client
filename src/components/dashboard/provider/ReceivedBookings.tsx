@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { getMyBookings, updateBookingStatus } from "@/services/bookings";
 import { toast } from "sonner";
+import ChatButton from "@/components/chat/ChatButton";
 
 export default function ReceivedBookings() {
   const [bookings, setBookings] = useState<any[]>([]);
@@ -141,12 +142,28 @@ export default function ReceivedBookings() {
                           </>
                         )}
                         {booking.status === "ACCEPTED" && (
-                           <button 
-                              onClick={() => handleStatusUpdate(booking.id, "COMPLETED")}
-                              className="px-4 py-2 rounded-xl bg-green-pale text-green-brand font-black text-[10px] uppercase tracking-widest hover:bg-green-brand hover:text-white transition-all shadow-sm"
-                           >
-                             Complete
-                           </button>
+                           <div className="flex items-center gap-2">
+                              <button 
+                                 onClick={() => handleStatusUpdate(booking.id, "COMPLETED")}
+                                 className="px-4 py-2 rounded-xl bg-green-pale text-green-brand font-black text-[10px] uppercase tracking-widest hover:bg-green-brand hover:text-white transition-all shadow-sm"
+                              >
+                                Complete
+                              </button>
+                              <ChatButton
+                                contextType="BOOKING"
+                                contextId={booking.id}
+                                participantName={booking.farmer?.name || "Farmer"}
+                                label="Chat"
+                              />
+                           </div>
+                        )}
+                        {booking.status === "COMPLETED" && (
+                           <ChatButton
+                             contextType="BOOKING"
+                             contextId={booking.id}
+                             participantName={booking.farmer?.name || "Farmer"}
+                             label="Chat"
+                           />
                         )}
                       </div>
                     </td>

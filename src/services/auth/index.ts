@@ -12,6 +12,8 @@ interface CustomJwtPayload {
   iat?: number;
 }
 
+import * as Sentry from "@sentry/nextjs";
+
 export const registerUser = async (userData: any) => {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/auth/register`, {
@@ -24,6 +26,9 @@ export const registerUser = async (userData: any) => {
 
     return await res.json();
   } catch (error: any) {
+    Sentry.captureException(error, {
+      extra: { userData: { ...userData, password: "[REDACTED]" } },
+    });
     return {
       success: false,
       message: error.message || "An unexpected error occurred",
@@ -150,4 +155,9 @@ export const updateProfile = async (data: any) => {
 export const UserLogOut = async () => {
   const storeCookie = await cookies();
   storeCookie.delete("token");
+};
+
+export const getAccessToken = async () => {
+  const storeCookie = await cookies();
+  return storeCookie.get("token")?.value;
 };

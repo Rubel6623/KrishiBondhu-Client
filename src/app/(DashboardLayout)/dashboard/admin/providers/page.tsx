@@ -17,7 +17,8 @@ import {
   ExternalLink,
   ShieldAlert
 } from "lucide-react";
-import { getAllUsers, updateUserStatus, deleteUser } from "@/services/user";
+import { getAllProviders } from "@/services/providers";
+import { updateUserStatus, deleteUser } from "@/services/user";
 import { toast } from "sonner";
 
 export default function AdminProvidersPage() {
@@ -28,11 +29,9 @@ export default function AdminProvidersPage() {
   const fetchProviders = async () => {
     setLoading(true);
     try {
-      const res = await getAllUsers();
+      const res = await getAllProviders();
       if (res.success) {
-        // Filter only PROVIDERS from the user list
-        const filtered = res.data.filter((u: any) => u.role === "PROVIDER");
-        setProviders(filtered);
+        setProviders(res.data);
       }
     } catch (error) {
       toast.error("Failed to load providers");
@@ -183,7 +182,9 @@ export default function AdminProvidersPage() {
                     <div className="p-2 rounded-xl bg-muted text-muted-foreground">
                        <Tractor className="w-4 h-4" />
                     </div>
-                    <span className="text-xs font-black uppercase tracking-widest text-muted-foreground">8 Active Equipments</span>
+                    <span className="text-xs font-black uppercase tracking-widest text-muted-foreground">
+                       {provider.equipment?.length || 0} Active Equipments
+                    </span>
                  </div>
                  <button className="text-[10px] font-black uppercase tracking-widest text-green-brand hover:underline flex items-center gap-1">
                     Full Profile <ExternalLink className="w-3 h-3" />

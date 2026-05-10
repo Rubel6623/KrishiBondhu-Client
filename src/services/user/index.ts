@@ -31,7 +31,7 @@ export const updateUserStatus = async (id: string, status: "ACTIVE" | "BANNED") 
   try {
     // Note: The server route for this might be /users/:id or similar.
     // Adjusting to /users/:id based on common patterns since /admin/users doesn't exist in server.
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/users/${id}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/users/${id}/status`, {
       method: "PATCH", // Changed from PUT to PATCH as per server's common update pattern
       headers: {
         "Content-Type": "application/json",

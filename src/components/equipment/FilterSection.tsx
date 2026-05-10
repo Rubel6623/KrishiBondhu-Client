@@ -6,6 +6,8 @@ import { useState, useEffect } from "react";
 interface FilterSectionProps {
   categories: any[];
   onFilterChange: (filters: any) => void;
+  sortBy?: string;
+  sortOrder?: string;
 }
 
 export default function FilterSection({ categories, onFilterChange }: FilterSectionProps) {

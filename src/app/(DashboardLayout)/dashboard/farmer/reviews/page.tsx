@@ -135,6 +135,9 @@ export default function FarmerReviews() {
           </div>
           <h3 className="text-xl font-serif font-black text-foreground">No reviews yet</h3>
           <p className="text-muted-foreground font-medium">Your reviews of equipment will appear here.</p>
+          <a href="/dashboard/farmer/bookings" className="mt-6 inline-block px-8 py-3 rounded-2xl bg-green-brand text-white font-black text-xs uppercase tracking-widest hover:bg-green-deep transition-all shadow-lg shadow-green-brand/20">
+            Write a Review
+          </a>
         </div>
       )}
     </div>

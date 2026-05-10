@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { motion } from "framer-motion";
+import RealTimeActivityFeed from "@/components/dashboard/RealTimeActivityFeed";
 import { 
   Users, 
   LayoutDashboard, 
@@ -318,6 +319,10 @@ export default function AdminDashboard() {
           </Link>
         </div>
       </div>
+
+      {/* Real-time Activity Feed */}
+      <RealTimeActivityFeed />
+
     </div>
   );
 }

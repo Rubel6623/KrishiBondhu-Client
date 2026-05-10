@@ -4,12 +4,12 @@ import SectionBackground from "./SectionBackground";
 
 export default function Services() {
   const services = [
-    { icon: <Tractor />, title: "Equipment Rental", desc: "Rent power tillers, harvesters, irrigation pumps, and 50+ types of agricultural machinery from verified providers near you.", price: "Starting from ৳ 400/day →", featured: true, tag: "Most Popular" },
-    { icon: <Bot />, title: "AI Crop Assistant", desc: "Get personalized crop advice, disease detection, and yield predictions powered by our intelligent farming AI trained on Bangladeshi agriculture data.", price: "Free for all farmers →" },
-    { icon: <FlaskConical />, title: "Soil Testing", desc: "Book certified soil testing services and receive detailed reports with fertilizer recommendations tailored to your specific land and crop type.", price: "Starting from ৳ 250 →" },
-    { icon: <Droplets />, title: "Irrigation Planning", desc: "AI-driven irrigation schedules, pump rental, and water management solutions to maximize yield while minimizing water usage.", price: "Consultation free →" },
-    { icon: <Layout />, title: "Farm Analytics", desc: "Track your spending, equipment usage, crop performance, and seasonal trends with a farmer-friendly analytics dashboard.", price: "Premium feature →" },
-    { icon: <MessageSquare />, title: "Provider Network", desc: "Connect directly with verified equipment providers, negotiate rates, and build long-term relationships for priority seasonal bookings.", price: "Join the network →" },
+    { icon: <Tractor />, title: "Equipment Rental", desc: "Rent power tillers, harvesters, irrigation pumps, and 50+ types of agricultural machinery from verified providers near you.", price: "Explore Equipment →", featured: true, tag: "Most Popular", href: "/equipment" },
+    { icon: <Bot />, title: "AI Crop Assistant", desc: "Get personalized crop advice, disease detection, and yield predictions powered by our intelligent farming AI trained on Bangladeshi agriculture data.", price: "Try AI Assistant →", href: "/ai-assistant" },
+    { icon: <FlaskConical />, title: "Soil Testing", desc: "Book certified soil testing services and receive detailed reports with fertilizer recommendations tailored to your specific land and crop type.", price: "Book Test →", href: "/services" },
+    { icon: <Droplets />, title: "Irrigation Planning", desc: "AI-driven irrigation schedules, pump rental, and water management solutions to maximize yield while minimizing water usage.", price: "Learn More →", href: "/services" },
+    { icon: <Layout />, title: "Farm Analytics", desc: "Track your spending, equipment usage, crop performance, and seasonal trends with a farmer-friendly analytics dashboard.", price: "View Dashboard →", href: "/dashboard" },
+    { icon: <MessageSquare />, title: "Provider Network", desc: "Connect directly with verified equipment providers, negotiate rates, and build long-term relationships for priority seasonal bookings.", price: "Find Specialists →", href: "/specialists" },
   ];
 
   return (
@@ -25,8 +25,9 @@ export default function Services() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {services.map((card, i) => (
-            <div 
-              className={`relative backdrop-blur-sm rounded-[32px] p-8 transition-all duration-350 hover:-translate-y-1 group border ${
+            <Link 
+              href={card.href}
+              className={`block relative backdrop-blur-sm rounded-[32px] p-8 transition-all duration-350 hover:-translate-y-1 group border cursor-pointer ${
                 card.featured 
                   ? "bg-green-brand dark:bg-green-brand border-green-bright shadow-xl shadow-green-brand/20" 
                   : "bg-white/40 dark:bg-white/5 border-black/5 dark:border-white/10"
@@ -69,7 +70,7 @@ export default function Services() {
               }`}>
                 {card.price}
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

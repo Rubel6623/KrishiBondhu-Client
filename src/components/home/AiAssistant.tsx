@@ -1,8 +1,10 @@
-import { Leaf, Calendar, Quote } from "lucide-react";
+import { Leaf, Calendar, Quote, Lock, ArrowRight } from "lucide-react";
 import SectionBackground from "./SectionBackground";
 import { AIFarmingAdvisor } from "@/components/AI_Features/KrishiBondhuChat";
+import { Button } from "../ui/button";
+import Link from "next/link";
 
-export default function AiAssistant() {
+export default function AiAssistant({ isLoggedIn }: { isLoggedIn: boolean }) {
   const features = [
     { icon: <Leaf />, title: "Crop Disease Detection", desc: "Upload a photo of your crop and get instant diagnosis with treatment recommendations in Bangla or English." },
     { icon: <Calendar />, title: "Smart Seasonal Planning", desc: "AI recommends optimal sowing and harvesting windows based on your location, soil type, and weather forecasts." },
@@ -14,8 +16,40 @@ export default function AiAssistant() {
       <SectionBackground />
       <div className="max-w-[1280px] mx-auto relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-[60px] items-center mt-14">
-          <div className="animate-in fade-in slide-in-from-left duration-1000">
-             <AIFarmingAdvisor />
+          <div className="animate-in fade-in slide-in-from-left duration-1000 relative">
+             {isLoggedIn ? (
+               <AIFarmingAdvisor />
+             ) : (
+               <div className="bg-white/40 dark:bg-white/5 backdrop-blur-md border-2 border-dashed border-green-brand/30 rounded-[32px] p-10 text-center flex flex-col items-center justify-center min-h-[400px] shadow-2xl overflow-hidden group">
+                 {/* Decorative background glow */}
+                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-green-brand/20 blur-[100px] rounded-full pointer-events-none" />
+                 
+                 <div className="w-20 h-20 rounded-full bg-green-brand/10 flex items-center justify-center mb-6 ring-8 ring-green-brand/5 group-hover:scale-110 transition-transform duration-500">
+                    <Lock className="w-10 h-10 text-green-brand animate-pulse" />
+                 </div>
+                 <h3 className="text-2xl font-serif font-black text-green-deep dark:text-white mb-4">AI Advisor is Locked</h3>
+                 <p className="text-sm text-text-muted max-w-[320px] mb-8 leading-relaxed">
+                   Experience the power of KrishiBondhu AI. Log in to your account to get expert agricultural advice and seasonal planning.
+                 </p>
+                 <Link href="/login">
+                   <Button className="h-14 px-8 rounded-2xl bg-green-brand hover:bg-green-deep text-white font-black uppercase tracking-widest text-xs flex gap-3 shadow-xl shadow-green-brand/30 hover:-translate-y-1 transition-all">
+                      Unlock AI Assistant
+                      <ArrowRight className="w-4 h-4" />
+                   </Button>
+                 </Link>
+                 
+                 <div className="mt-8 flex gap-4 opacity-50">
+                    <div className="flex -space-x-3">
+                       {[1,2,3,4].map(i => (
+                         <div key={i} className="w-8 h-8 rounded-full border-2 border-background bg-muted overflow-hidden">
+                           <img src={`https://i.pravatar.cc/150?u=farmer${i}`} alt="user" className="w-full h-10 object-cover" />
+                         </div>
+                       ))}
+                    </div>
+                    <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest pt-2">Join 10k+ Farmers</p>
+                 </div>
+               </div>
+             )}
           </div>
           <div>
             <div className="inline-flex items-center gap-2 text-[11px] font-semibold tracking-[2px] uppercase text-green-brand dark:text-green-light mb-4 before:content-[''] before:block before:w-6 before:h-0.5 before:bg-green-brand dark:before:bg-green-light before:rounded-sm">AI-Powered Features</div>

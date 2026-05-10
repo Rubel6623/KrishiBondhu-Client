@@ -89,6 +89,11 @@ export const Navbar = () => {
       href: "/pricing",
     },
     {
+      title: "Knowledge Hub",
+      description: "Expert farming tips and agricultural insights",
+      href: "/blogs",
+    },
+    {
       title: "About Us",
       description: "Our mission to support farmers across the nation",
       href: "/about",
@@ -161,10 +166,21 @@ export const Navbar = () => {
               <NavigationMenuItem>
                 <NavigationMenuLink asChild>
                   <Link
-                    href="/services"
+                    href="/specialists"
                     className={`${navigationMenuTriggerStyle()} bg-transparent text-foreground hover:text-green-600 transition-colors`}
                   >
-                    Services
+                    Specialists
+                  </Link>
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+
+              <NavigationMenuItem>
+                <NavigationMenuLink asChild>
+                  <Link
+                    href="/blogs"
+                    className={`${navigationMenuTriggerStyle()} bg-transparent text-foreground hover:text-green-600 transition-colors`}
+                  >
+                    Blogs
                   </Link>
                 </NavigationMenuLink>
               </NavigationMenuItem>
@@ -185,20 +201,28 @@ export const Navbar = () => {
             <ThemeToggle />
             {user ? (
               <div className="flex items-center gap-4">
-                <Link href={user.role === "PROVIDER" ? "/dashboard/provider/add-equipment" : "/dashboard/farmer/bookings"}>
+                <Link href={
+                  user.role === "PROVIDER" ? "/dashboard/provider/add-equipment" : 
+                  user.role === "VETERINARIAN" ? "/dashboard/veterinarian/appointments" : 
+                  user.role === "ADMIN" ? "/dashboard/admin" : 
+                  "/dashboard/farmer/bookings"
+                }>
                   <Button className="bg-green-600 text-white hover:bg-green-700 flex gap-2 shadow-lg shadow-green-500/20 rounded-xl px-6">
-                    <PlusCircle className="w-4 h-4" />
-                    {user.role === "PROVIDER" ? "List Equipment" : "My Bookings"}
+                    {user.role === "ADMIN" ? <LayoutDashboard className="w-4 h-4" /> : <PlusCircle className="w-4 h-4" />}
+                    {user.role === "PROVIDER" ? "List Equipment" : 
+                     user.role === "VETERINARIAN" ? "Appointments" : 
+                     user.role === "ADMIN" ? "Admin Panel" : 
+                     "My Bookings"}
                   </Button>
                 </Link>
                 
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="relative h-10 w-10 rounded-full hover:bg-transparent p-0">
-                       <Avatar className="h-10 w-10 border-2 border-border hover:border-green-600 transition-colors">
-                         <AvatarImage src={user.avatarUrl} alt={user.name} />
-                         <AvatarFallback className="bg-green-50 text-green-900 font-bold">{user.name?.[0] || 'U'}</AvatarFallback>
-                       </Avatar>
+                        <Avatar className="h-10 w-10 border-2 border-border hover:border-green-600 transition-colors">
+                          <AvatarImage src={user.avatar} alt={user.name} />
+                          <AvatarFallback className="bg-green-50 text-green-900 font-bold">{user.name?.[0] || 'U'}</AvatarFallback>
+                        </Avatar>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-64 p-2 rounded-2xl bg-background border border-border shadow-2xl" align="end" sideOffset={12}>
@@ -313,8 +337,13 @@ export const Navbar = () => {
                     </Link>
                   </SheetClose>
                   <SheetClose asChild>
-                    <Link href="/services" className="text-lg font-medium text-foreground hover:text-green-600 transition-colors">
-                      Services
+                    <Link href="/specialists" className="text-lg font-medium text-foreground hover:text-green-600 transition-colors">
+                      Specialists
+                    </Link>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Link href="/blogs" className="text-lg font-medium text-foreground hover:text-green-600 transition-colors">
+                      Blogs
                     </Link>
                   </SheetClose>
                   <SheetClose asChild>
@@ -328,10 +357,18 @@ export const Navbar = () => {
                   {user ? (
                     <>
                       <SheetClose asChild>
-                        <Link href={user.role === "PROVIDER" ? "/dashboard/provider/add-equipment" : "/dashboard/farmer/bookings"}>
+                        <Link href={
+                          user.role === "PROVIDER" ? "/dashboard/provider/add-equipment" : 
+                          user.role === "VETERINARIAN" ? "/dashboard/veterinarian/appointments" : 
+                          user.role === "ADMIN" ? "/dashboard/admin" : 
+                          "/dashboard/farmer/bookings"
+                        }>
                           <Button className="w-full justify-start gap-3 bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-500/20">
-                            <PlusCircle className="w-5 h-5" />
-                            {user.role === "PROVIDER" ? "List Equipment" : "My Bookings"}
+                            {user.role === "ADMIN" ? <LayoutDashboard className="w-5 h-5" /> : <PlusCircle className="w-5 h-5" />}
+                            {user.role === "PROVIDER" ? "List Equipment" : 
+                             user.role === "VETERINARIAN" ? "Appointments" : 
+                             user.role === "ADMIN" ? "Admin Panel" : 
+                             "My Bookings"}
                           </Button>
                         </Link>
                       </SheetClose>

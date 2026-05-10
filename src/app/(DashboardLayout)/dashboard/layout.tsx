@@ -24,44 +24,55 @@ import {
   MessageSquare,
   History,
   FileText,
-  Settings
+  Settings,
+  Sparkles,
+  BrainCircuit,
+  Stethoscope
 } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { getUser, UserLogOut } from "@/services/auth";
+import { getUser, UserLogOut, getMe } from "@/services/auth";
 import { useRouter, usePathname } from "next/navigation";
 import { ThemeToggle } from "@/components/shared/ThemeToggle";
-// import { getMyNotifications } from "@/services/notifications"; // Ensure this service exists or mock it
+import LiveNotificationBell from "@/components/shared/LiveNotificationBell";
+import { getUnreadCount } from "@/services/chat";
 
 const menuItems = {
   FARMER: [
     { label: "Overview", icon: LayoutDashboard, href: "/dashboard/farmer" },
     { label: "Rent Equipment", icon: Search, href: "/equipment" },
     { label: "My Bookings", icon: History, href: "/dashboard/farmer/bookings" },
+    { label: "Consultations", icon: ListTodo, href: "/dashboard/farmer/appointments" },
     { label: "AI Crop Assistant", icon: Leaf, href: "/ai/crop-assistant" },
+    { label: "Smart Recommendations", icon: Sparkles, href: "/dashboard/farmer/recommendations" },
     { label: "Notifications", icon: Bell, href: "/dashboard/notifications" },
     { label: "Payment History", icon: CreditCard, href: "/dashboard/farmer/payments" },
     { label: "My Reviews", icon: Star, href: "/dashboard/farmer/reviews" },
+    { label: "Messages", icon: MessageSquare, href: "/dashboard/messages" },
   ],
   PROVIDER: [
     { label: "Overview", icon: LayoutDashboard, href: "/dashboard/provider" },
     { label: "My Equipment", icon: Tractor, href: "/dashboard/provider/equipment" },
     { label: "Add Equipment", icon: PlusCircle, href: "/dashboard/provider/add-equipment" },
     { label: "Received Bookings", icon: ListTodo, href: "/dashboard/provider/bookings" },
+    { label: "Consultations", icon: ListTodo, href: "/dashboard/provider/appointments" },
     { label: "Earnings", icon: Wallet, href: "/dashboard/provider/earnings" },
     { label: "Notifications", icon: Bell, href: "/dashboard/notifications" },
     { label: "Reviews & Ratings", icon: Star, href: "/dashboard/provider/reviews" },
+    { label: "Messages", icon: MessageSquare, href: "/dashboard/messages" },
   ],
   ADMIN: [
     { label: "Analytics", icon: BarChart3, href: "/dashboard/admin" },
     { label: "User Management", icon: User, href: "/dashboard/admin/users" },
     { label: "Providers", icon: ShieldCheck, href: "/dashboard/admin/providers" },
+    { label: "Specialists", icon: Stethoscope, href: "/dashboard/admin/specialists" },
     { label: "Equipment", icon: Tractor, href: "/dashboard/admin/equipment" },
     { label: "All Bookings", icon: ListTodo, href: "/dashboard/admin/bookings" },
     { label: "Categories", icon: FolderOpen, href: "/dashboard/admin/categories" },
     { label: "Platform Blogs", icon: FileText, href: "/dashboard/admin/blogs" },
+    { label: "Manage Blogs", icon: ListTodo, href: "/dashboard/admin/blogs/manage" },
+    { label: "AI Analytics", icon: BrainCircuit, href: "/dashboard/admin/ai-analytics" },
     { label: "Notifications", icon: Bell, href: "/dashboard/notifications" },
-    { label: "System Settings", icon: Settings, href: "/dashboard/admin/settings" },
   ],
   VETERINARIAN: [
     { label: "Overview", icon: LayoutDashboard, href: "/dashboard/veterinarian" },
@@ -70,6 +81,7 @@ const menuItems = {
     { label: "Consultation History", icon: History, href: "/dashboard/veterinarian/history" },
     { label: "Reviews", icon: Star, href: "/dashboard/veterinarian/reviews" },
     { label: "Notifications", icon: Bell, href: "/dashboard/notifications" },
+    { label: "Messages", icon: MessageSquare, href: "/dashboard/messages" },
   ],
 };
 
@@ -92,7 +104,12 @@ export default function DashboardLayout({
         return;
       } 
       
-      setUser(userData);
+      const fullProfile = await getMe();
+      if (fullProfile?.success) {
+        setUser(fullProfile.data);
+      } else {
+        setUser(userData);
+      }
 
       // Role-based Path Protection
       const role = userData.role;
@@ -108,6 +125,25 @@ export default function DashboardLayout({
     };
     fetchUser();
   }, [router, pathname]);
+
+  useEffect(() => {
+    const fetchUnread = async () => {
+      try {
+        const res = await getUnreadCount();
+        if (res.success) {
+          setUnreadCount(res.data.count);
+        }
+      } catch (err) {
+        console.error("Failed to fetch unread count", err);
+      }
+    };
+    if (user) {
+      fetchUnread();
+      // Poll every 60 seconds as a fallback, real-time updates happen via socket in dedicated pages
+      const interval = setInterval(fetchUnread, 60000);
+      return () => clearInterval(interval);
+    }
+  }, [user, pathname]);
 
   // Handle mobile responsive sidebar
   useEffect(() => {
@@ -201,7 +237,14 @@ export default function DashboardLayout({
                     }`}
                   >
                     <item.icon className={`w-5 h-5 transition-transform group-hover:scale-110 ${isActive ? "text-white" : ""}`} />
-                    <span className="font-bold text-sm">{item.label}</span>
+                    <span className="font-bold text-sm flex-1">{item.label}</span>
+                    {item.label === "Messages" && unreadCount > 0 && (
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
+                        isActive ? "bg-white text-green-brand" : "bg-red-500 text-white"
+                      }`}>
+                        {unreadCount}
+                      </span>
+                    )}
                   </Link>
                 );
               })}
@@ -221,7 +264,7 @@ export default function DashboardLayout({
               </Link>
               <button
                 onClick={handleLogout}
-                className="w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all group"
+                className="w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all group cursor-pointer"
               >
                 <LogOut className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
                 <span className="text-sm font-bold">Logout</span>
@@ -259,14 +302,7 @@ export default function DashboardLayout({
                <ThemeToggle />
             </div>
             
-            <Link href="/dashboard/notifications" className="relative p-2.5 text-muted-foreground hover:bg-gray-100 dark:hover:bg-white/5 rounded-xl transition-colors border border-border group">
-              <Bell className="w-6 h-6 group-hover:rotate-12 transition-transform" />
-              {unreadCount > 0 && (
-                <span className="absolute top-2 right-2 w-5 h-5 bg-red-500 border-2 border-white dark:border-zinc-900 rounded-full flex items-center justify-center text-[10px] text-white font-black">
-                  {unreadCount > 9 ? '9+' : unreadCount}
-                </span>
-              )}
-            </Link>
+            <LiveNotificationBell />
 
             <div className="flex items-center gap-4 pl-6 border-l border-gray-200 dark:border-white/5">
               <div className="text-right hidden sm:block">
@@ -277,9 +313,9 @@ export default function DashboardLayout({
                   Verified {role}
                 </p>
               </div>
-              <div className="w-12 h-12 rounded-2xl bg-green-brand/10 border-2 border-green-brand/20 flex items-center justify-center text-green-brand font-black text-lg overflow-hidden shadow-inner">
-                {user.avatarUrl ? (
-                  <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
+              <div className="w-12 h-12 rounded-full bg-green-brand/10 border-2 border-green-brand/20 flex items-center justify-center text-green-brand font-black text-lg overflow-hidden shadow-inner">
+                {user.avatar ? (
+                  <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
                 ) : (
                   user.name.charAt(0)
                 )}

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
   Stethoscope, 
@@ -11,12 +12,14 @@ import {
   ShieldCheck,
   Star,
   ArrowUpRight,
-  Sparkles
+  Sparkles,
+  Loader2
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { getAllSpecialists } from "@/services/specialist";
 
-const specialists = [
+const staticSpecialists = [
   {
     name: "Dr. Rakibul Hasan",
     title: "Senior Veterinarian",
@@ -53,6 +56,42 @@ const specialists = [
 ];
 
 export default function SpecialistsSection() {
+  const [specialistList, setSpecialistList] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchSpecialists = async () => {
+      try {
+        const res = await getAllSpecialists({ limit: 3 });
+        const dataArray = res.data?.data || res.data || [];
+
+        if (res.success && Array.isArray(dataArray) && dataArray.length > 0) {
+          const mapped = dataArray.slice(0, 3).map((item: any, idx: number) => ({
+            id: item.id,
+            name: item.user?.name || "Expert Specialist",
+            title: item.specialization || "Agricultural Expert",
+            expertise: item.qualifications || "Farming Consultant",
+            experience: `${item.experienceYears || 5}+ Years`,
+            rating: "4.9", // Static for now
+            reviews: Math.floor(Math.random() * 1000) + 100,
+            status: idx % 2 === 0 ? "Online" : "Consulting",
+            image: item.user?.avatar || staticSpecialists[idx % staticSpecialists.length].image,
+            tags: item.specialization ? item.specialization.split(',').slice(0, 3) : ["Expert", "Farming"]
+          }));
+          setSpecialistList(mapped);
+        } else {
+          setSpecialistList(staticSpecialists);
+        }
+      } catch (error) {
+        console.error("Failed to fetch specialists:", error);
+        setSpecialistList(staticSpecialists);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSpecialists();
+  }, []);
   return (
     <section className="py-24 px-[5%] relative overflow-hidden bg-background">
       {/* Decorative Elements */}
@@ -100,68 +139,76 @@ export default function SpecialistsSection() {
         </div>
 
         {/* Specialists Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {specialists.map((specialist, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-              className="group bg-white dark:bg-zinc-950 rounded-[40px] border border-border p-8 hover:shadow-2xl hover:border-green-brand/30 transition-all relative"
-            >
-              {/* Profile Image & Status */}
-              <div className="relative mb-8">
-                <div className="w-24 h-24 rounded-[32px] overflow-hidden border-2 border-green-brand/20 group-hover:scale-110 transition-transform duration-500 shadow-xl">
-                  <img 
-                    src={specialist.image} 
-                    alt={specialist.name} 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className={`absolute -bottom-2 -right-2 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg ${
-                  specialist.status === 'Online' ? 'bg-green-500 text-white' : 'bg-amber-500 text-white'
-                }`}>
-                  {specialist.status}
-                </div>
-              </div>
-
-              {/* Info */}
-              <div className="space-y-4">
-                <div>
-                   <h3 className="text-2xl font-serif font-black text-foreground group-hover:text-green-brand transition-colors">{specialist.name}</h3>
-                   <p className="text-sm font-bold text-green-brand/80 mt-1">{specialist.title}</p>
+        {isLoading ? (
+          <div className="flex justify-center items-center py-20">
+            <Loader2 className="animate-spin text-green-brand w-10 h-10" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {specialistList.map((specialist, index) => (
+              <motion.div
+                key={specialist.id || index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                className="group bg-white dark:bg-zinc-950 rounded-[40px] border border-border p-8 hover:shadow-2xl hover:border-green-brand/30 transition-all relative flex flex-col justify-between"
+              >
+                {/* Profile Image & Status */}
+                <div className="relative mb-8">
+                  <div className="w-24 h-24 rounded-[32px] overflow-hidden border-2 border-green-brand/20 group-hover:scale-110 transition-transform duration-500 shadow-xl">
+                    <img 
+                      src={specialist.image} 
+                      alt={specialist.name} 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className={`absolute -bottom-2 -right-2 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg ${
+                    specialist.status === 'Online' ? 'bg-green-500 text-white' : 'bg-amber-500 text-white'
+                  }`}>
+                    {specialist.status}
+                  </div>
                 </div>
 
-                <div className="flex flex-wrap gap-2">
-                   {specialist.tags.map(tag => (
-                     <span key={tag} className="text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-lg bg-muted text-muted-foreground group-hover:bg-green-brand/10 group-hover:text-green-brand transition-colors">
-                       {tag}
-                     </span>
-                   ))}
-                </div>
+                {/* Info */}
+                <div className="space-y-4 flex-1 flex flex-col">
+                  <div>
+                     <h3 className="text-2xl font-serif font-black text-foreground group-hover:text-green-brand transition-colors">{specialist.name}</h3>
+                     <p className="text-sm font-bold text-green-brand/80 mt-1">{specialist.title}</p>
+                  </div>
 
-                <div className="pt-6 border-t border-border grid grid-cols-2 gap-4">
-                   <div className="space-y-1">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Experience</p>
-                      <p className="text-sm font-bold text-foreground">{specialist.experience}</p>
-                   </div>
-                   <div className="space-y-1">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Rating</p>
-                      <p className="text-sm font-bold text-foreground flex items-center gap-1">
-                        <Star className="w-3 h-3 text-gold fill-gold" /> {specialist.rating} ({specialist.reviews})
-                      </p>
-                   </div>
-                </div>
+                  <div className="flex flex-wrap gap-2">
+                     {specialist.tags.map((tag: string) => (
+                       <span key={tag} className="text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-lg bg-muted text-muted-foreground group-hover:bg-green-brand/10 group-hover:text-green-brand transition-colors">
+                         {tag}
+                       </span>
+                     ))}
+                  </div>
 
-                <button className="w-full py-4 mt-6 rounded-2xl bg-zinc-900 text-white dark:bg-white dark:text-black font-black text-xs uppercase tracking-widest hover:bg-green-brand dark:hover:bg-green-brand hover:text-white transition-all flex items-center justify-center gap-2 group-hover:shadow-lg shadow-green-brand/20">
-                   <MessageCircle className="w-4 h-4" />
-                   Start Consultation
-                </button>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+                  <div className="pt-6 border-t border-border grid grid-cols-2 gap-4 mt-auto">
+                     <div className="space-y-1">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Experience</p>
+                        <p className="text-sm font-bold text-foreground">{specialist.experience}</p>
+                     </div>
+                     <div className="space-y-1">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Rating</p>
+                        <p className="text-sm font-bold text-foreground flex items-center gap-1">
+                          <Star className="w-3 h-3 text-gold fill-gold" /> {specialist.rating} ({specialist.reviews})
+                        </p>
+                     </div>
+                  </div>
+
+                  <Link href={`/specialists/${specialist.id || ''}`}>
+                    <button className="w-full py-4 mt-6 rounded-2xl bg-zinc-900 text-white dark:bg-white dark:text-black font-black text-xs uppercase tracking-widest hover:bg-green-brand dark:hover:bg-green-brand hover:text-white transition-all flex items-center justify-center gap-2 group-hover:shadow-lg shadow-green-brand/20">
+                       <MessageCircle className="w-4 h-4" />
+                       Start Consultation
+                    </button>
+                  </Link>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
 
         {/* Feature Highlights */}
         <div className="mt-20 grid grid-cols-1 md:grid-cols-4 gap-6">

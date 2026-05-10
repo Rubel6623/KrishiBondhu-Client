@@ -10,8 +10,11 @@ import TopProviders from "../../components/home/TopProviders";
 import CtaBanner from "../../components/home/CtaBanner";
 import Blog from "../../components/home/Blog";
 import SpecialistsSection from "../../components/home/SpecialistsSection";
+import { getUser } from "@/services/auth";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const user = await getUser();
+
   return (
     <>
       <Hero />
@@ -20,7 +23,7 @@ export default function HomePage() {
       <EquipmentMarketplace />
       <TopProviders />
       <SpecialistsSection />
-      <AiAssistant />
+      <AiAssistant isLoggedIn={!!user} />
       <CtaBanner />
       <HowItWorks />
       <Stats />

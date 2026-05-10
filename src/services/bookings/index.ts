@@ -29,6 +29,33 @@ export const getMyBookings = async (filters: any = {}) => {
   }
 };
 
+export const createBooking = async (data: any) => {
+  const storeCookie = await cookies();
+  const token = storeCookie.get("token")?.value;
+
+  try {
+    const res = await fetch(`${BASE_URL}/bookings`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    });
+
+    const result = await res.json();
+    if (result.success) {
+      (revalidateTag as any)("bookings");
+    }
+    return result;
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error.message || "Failed to create booking",
+    };
+  }
+};
+
 export const updateBookingStatus = async (id: string, status: string) => {
   const storeCookie = await cookies();
   const token = storeCookie.get("token")?.value;

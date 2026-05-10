@@ -12,7 +12,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { registerUser } from "@/services/auth";
-import { Leaf, User, Phone, Mail, Lock, MapPin } from "lucide-react";
+import { Leaf, User, Phone, Mail, Lock, MapPin, ArrowLeft } from "lucide-react";
+import SocialLogin from "@/components/shared/SocialLogin";
 
 const registerSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -64,6 +65,16 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4 md:p-8">
+
+      <Link 
+            href="/" 
+            className="absolute top-4 left-4 inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors mb-8 group border border-border shadow-2xl p-2 rounded-2xl hover:border-primary hover:text-primary"
+          >
+            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+            Back to Home
+          </Link>
+      
+
       {/* Background Decorative Elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-50">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-green-brand/5 blur-[120px] rounded-full animate-floatOrb" />
@@ -72,6 +83,8 @@ export default function RegisterPage() {
 
       <div className="w-full max-w-xl bg-card border border-border shadow-2xl rounded-3xl overflow-hidden relative z-10 animate-fadeUp">
         <div className="p-8 md:p-12">
+          
+
           <div className="flex flex-col items-center mb-8">
             <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-4 ring-1 ring-primary/20">
               <Leaf className="w-8 h-8 text-primary" />
@@ -188,6 +201,10 @@ export default function RegisterPage() {
               )}
             </Button>
           </form>
+
+          <div className="mt-8">
+            <SocialLogin />
+          </div>
 
           <div className="mt-8 text-center text-sm text-muted-foreground">
             Already have an account?{" "}

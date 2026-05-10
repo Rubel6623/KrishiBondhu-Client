@@ -19,11 +19,18 @@ import {
 import { getMyBookings } from "@/services/bookings";
 import { toast } from "sonner";
 import Link from "next/link";
+import ChatButton from "@/components/chat/ChatButton";
+import ReviewModal from "@/components/dashboard/farmer/ReviewModal";
 
 export default function FarmerBookings() {
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState("ALL");
+  const [reviewModal, setReviewModal] = useState<{ isOpen: boolean; equipmentId: string; equipmentTitle: string }>({
+    isOpen: false,
+    equipmentId: "",
+    equipmentTitle: ""
+  });
 
   const fetchBookings = async () => {
     setLoading(true);
@@ -149,11 +156,33 @@ export default function FarmerBookings() {
                       <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Total Rental</div>
                       <div className="text-3xl font-serif font-black text-green-brand">৳{booking.totalPrice.toLocaleString()}</div>
                    </div>
-                   <Link href={`/equipment/${booking.equipmentId}`}>
-                      <button className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-muted hover:bg-zinc-900 hover:text-white transition-all text-xs font-black uppercase tracking-widest">
-                         Re-book <RefreshCw className="w-4 h-4" />
-                      </button>
-                   </Link>
+                    <div className="flex flex-col gap-2">
+                      {booking.status === "COMPLETED" && (
+                        <button 
+                          onClick={() => setReviewModal({
+                            isOpen: true,
+                            equipmentId: booking.equipmentId,
+                            equipmentTitle: booking.equipment?.title || "Equipment"
+                          })}
+                          className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-green-brand text-white hover:bg-green-deep transition-all text-xs font-black uppercase tracking-widest shadow-lg shadow-green-brand/10"
+                        >
+                           Give Review <ShoppingBag className="w-4 h-4" />
+                        </button>
+                      )}
+                      <Link href={`/equipment/${booking.equipmentId}`}>
+                         <button className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-muted hover:bg-zinc-900 hover:text-white transition-all text-xs font-black uppercase tracking-widest">
+                            Re-book <RefreshCw className="w-4 h-4" />
+                         </button>
+                      </Link>
+                      {(booking.status === "ACCEPTED" || booking.status === "IN_PROGRESS" || booking.status === "COMPLETED") && (
+                        <ChatButton
+                          contextType="BOOKING"
+                          contextId={booking.id}
+                          participantName={booking.equipment?.provider?.name || "Provider"}
+                          label="Chat with Owner"
+                        />
+                      )}
+                    </div>
                 </div>
               </div>
             </motion.div>
@@ -171,6 +200,13 @@ export default function FarmerBookings() {
           <Link href="/equipment" className="mt-6 inline-block text-green-brand font-black text-sm hover:underline">Browse Equipment →</Link>
         </div>
       )}
+
+      <ReviewModal 
+        isOpen={reviewModal.isOpen}
+        onClose={() => setReviewModal({ ...reviewModal, isOpen: false })}
+        equipmentId={reviewModal.equipmentId}
+        equipmentTitle={reviewModal.equipmentTitle}
+      />
     </div>
   );
 }

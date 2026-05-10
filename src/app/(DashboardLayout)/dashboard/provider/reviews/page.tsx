@@ -9,11 +9,15 @@ import {
   Loader2,
   AlertCircle
 } from "lucide-react";
+import { toast } from "sonner";
+import { io } from "socket.io-client";
+import { useRouter } from "next/navigation";
 import { getMyReviews } from "@/services/reviews";
 
 export default function ProviderReviewsPage() {
   const [reviews, setReviews] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchReviews = async () => {
@@ -23,7 +27,33 @@ export default function ProviderReviewsPage() {
       setIsLoading(false);
     };
     fetchReviews();
-  }, []);
+
+    // Socket listener for real-time review updates
+    const token = document.cookie
+      .split("; ")
+      .find((r) => r.startsWith("token="))
+      ?.split("=")[1];
+    
+    if (token) {
+      const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5000", {
+        auth: { token },
+        path: "/socket.io",
+        transports: ["websocket"],
+      });
+
+      socket.on("new_review", (review: any) => {
+        setReviews(prev => [review, ...prev]);
+        toast.success("New Review Received!", {
+          description: "A customer just left feedback for your equipment."
+        });
+        router.refresh();
+      });
+
+      return () => {
+        socket.disconnect();
+      };
+    }
+  }, [router]);
 
   if (isLoading) {
     return (

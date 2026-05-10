@@ -1,21 +1,47 @@
-# Next.js template
+# KrishiBondhu Client
 
-This is a Next.js template with shadcn/ui.
+## Project Overview
+KrishiBondhu is a comprehensive platform designed to bridge the gap between farmers, veterinarians, and service providers. It offers an intuitive interface for managing consultations, real-time chat, an equipment marketplace, and AI-powered assistance for farming insights. The client application provides tailored, modern dashboards with a focus on seamless user experience for Farmers, Veterinarians, and Providers.
 
-## Adding components
+## Tech Stack
+- **Framework:** Next.js (App Router)
+- **UI Library:** React
+- **Styling:** Tailwind CSS, Shadcn UI, Framer Motion, Radix UI
+- **State Management & Data Fetching:** React Query
+- **Form Handling:** React Hook Form, Zod
+- **Real-time Communication:** Socket.io-client
+- **Authentication & Backend Integration:** JWT, Firebase
+- **AI Integration:** Google Generative AI SDK (`@google/generative-ai`)
+- **Monitoring:** Sentry
 
-To add components to your app, run the following command:
+## AI Features Explanation
+The KrishiBondhu client integrates with the Gemini API to offer smart, AI-powered features directly to users:
+- **AI Assistant:** Provides farmers with immediate insights on crop diseases, weather impacts, and modern farming techniques through an interactive chat interface.
+- **Smart Context:** Leverages Google's Generative AI to understand agricultural queries and provide relevant recommendations.
 
-```bash
-npx shadcn@latest add button
-```
+## Setup Instructions
 
-This will place the ui components in the `components` directory.
+1. **Navigate to the client directory:**
+   ```bash
+   cd KrishiBondhu-Client
+   ```
 
-## Using components
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-To use the components in your app, import them as follows:
+3. **Set up environment variables:**
+   Create a `.env` file in the root of the client project and configure the necessary variables (API URLs, keys, Sentry DSN, etc.):
+   ```env
+   NEXT_PUBLIC_API_URL=http://localhost:5000/api/v1
+   # Add other required keys here
+   ```
 
-```tsx
-import { Button } from "@/components/ui/button";
-```
+4. **Run the development server:**
+   ```bash
+   npm run dev
+   ```
+
+5. **View the application:**
+   Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.

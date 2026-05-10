@@ -1,5 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import { Leaf } from "lucide-react";
+import { useEffect, useState } from "react";
+import { getUser, getMe } from "@/services/auth";
 
 const FacebookIcon = ({ size = 24 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -29,6 +33,67 @@ const YoutubeIcon = ({ size = 24 }: { size?: number }) => (
 );
 
 const Footer = () => {
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const decodedUser = await getUser();
+      if (decodedUser) {
+        const fullProfile = await getMe();
+        if (fullProfile?.success) {
+          setUser(fullProfile.data);
+        } else {
+          setUser(decodedUser);
+        }
+      }
+    };
+    fetchUser();
+  }, []);
+
+  const getRoleLinks = () => {
+    if (!user) {
+      return [
+        { name: "Join as Farmer", href: "/register" },
+        { name: "Join as Provider", href: "/register?role=provider" },
+        { name: "Login to Account", href: "/login" },
+      ];
+    }
+    
+    switch (user.role) {
+      case "FARMER":
+        return [
+          { name: "Farmer Dashboard", href: "/dashboard/farmer" },
+          { name: "My Bookings", href: "/dashboard/farmer/bookings" },
+          { name: "AI Recommendations", href: "/dashboard/farmer/ai-assistant" },
+          { name: "My Profile", href: "/dashboard/farmer/profile" },
+        ];
+      case "PROVIDER":
+        return [
+          { name: "Provider Dashboard", href: "/dashboard/provider" },
+          { name: "List Equipment", href: "/dashboard/provider/add-equipment" },
+          { name: "My Equipment", href: "/dashboard/provider/equipment" },
+          { name: "My Profile", href: "/dashboard/provider/profile" },
+        ];
+      case "VETERINARIAN":
+        return [
+          { name: "Veterinarian Dashboard", href: "/dashboard/veterinarian" },
+          { name: "My Appointments", href: "/dashboard/veterinarian/appointments" },
+          { name: "My Profile", href: "/dashboard/veterinarian/profile" },
+        ];
+      case "ADMIN":
+        return [
+          { name: "Admin Dashboard", href: "/dashboard/admin" },
+          { name: "Manage Users", href: "/dashboard/admin/users" },
+          { name: "Manage Equipment", href: "/dashboard/admin/equipment" },
+          { name: "System Analytics", href: "/dashboard/admin/analytics" },
+        ];
+      default:
+        return [];
+    }
+  };
+
+  const roleLinks = getRoleLinks();
+
   return (
     <footer className="bg-green-950 dark:bg-green-950 py-16 px-6 sm:px-10 lg:px-[5%] text-gray-300">
       <div className="max-w-[1280px] mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 pb-12 border-b border-white/10 mb-8">
@@ -65,7 +130,7 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Links Column 1 */}
+        {/* Links Column 1: Public */}
         <div>
           <h3 className="text-sm font-bold text-white tracking-wider uppercase mb-6 flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-green-600"></span>
@@ -75,9 +140,9 @@ const Footer = () => {
             {[
               { name: "Equipment Marketplace", href: "/equipment" },
               { name: "Find Providers", href: "/providers" },
-              { name: "All Services", href: "/services" },
+              { name: "Specialists", href: "/specialists" },
               { name: "AI Crop Assistant", href: "/ai/crop-assistant" },
-              { name: "Knowledge Hub", href: "/blog" },
+              { name: "Knowledge Hub", href: "/blogs" },
               { name: "About Us", href: "/about" },
               { name: "Contact Us", href: "/contact-us" }
             ].map((link, i) => (
@@ -90,21 +155,14 @@ const Footer = () => {
           </ul>
         </div>
 
-        {/* Links Column 2 */}
+        {/* Links Column 2: Role Based */}
         <div>
           <h3 className="text-sm font-bold text-white tracking-wider uppercase mb-6 flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-green-600"></span>
-            Farmers
+            {user ? "My Account" : "Get Started"}
           </h3>
           <ul className="flex flex-col gap-3.5">
-            {[
-              { name: "Join as Farmer", href: "/register" },
-              { name: "Farmer Dashboard", href: "/dashboard/farmer" },
-              { name: "AI Recommendations", href: "/dashboard/farmer/ai-assistant" },
-              { name: "My Bookings", href: "/dashboard/farmer/bookings" },
-              { name: "FAQ", href: "/faq" },
-              { name: "Support", href: "/support" }
-            ].map((link, i) => (
+            {roleLinks.map((link, i) => (
               <li key={i}>
                 <Link href={link.href} className="text-sm text-gray-400 hover:text-[var(--green-bright)] hover:translate-x-1 transition-all inline-block">
                   {link.name}
@@ -114,17 +172,17 @@ const Footer = () => {
           </ul>
         </div>
 
-        {/* Newsletter / Providers */}
+        {/* Links Column 3: Support */}
         <div className="flex flex-col gap-6">
           <div>
             <h3 className="text-sm font-bold text-white tracking-wider uppercase mb-6 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-green-600"></span>
-              Providers
+              Support & Legal
             </h3>
             <ul className="flex flex-col gap-3.5">
               {[
-                { name: "List Equipment", href: "/register?role=provider" },
-                { name: "Provider Dashboard", href: "/dashboard/provider" },
+                { name: "Help Center & FAQ", href: "/faq" },
+                { name: "Customer Support", href: "/support" },
                 { name: "Privacy Policy", href: "/privacy-policy" },
                 { name: "Terms & Conditions", href: "/terms-conditions" }
               ].map((link, i) => (

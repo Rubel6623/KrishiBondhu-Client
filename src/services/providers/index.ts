@@ -15,3 +15,17 @@ export const getAllProviders = async (query?: Record<string, any>) => {
     };
   }
 };
+
+export const getProviderById = async (id: string) => {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/providers/${id}`, {
+      method: "GET",
+    });
+    return await res.json();
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error.message || "Failed to fetch provider details",
+    };
+  }
+};

@@ -7,29 +7,39 @@ import {
   Users, 
   Stethoscope, 
   Clock, 
-  CheckCircle2, 
-  AlertCircle, 
   TrendingUp, 
   Star,
   ChevronRight,
-  Video,
-  FileText,
-  MapPin
+  Video
 } from "lucide-react";
-import { getUser } from "@/services/auth";
+import { getMyAppointments } from "@/services/appointments";
+import { getMySpecialistProfile } from "@/services/specialist";
 import { Loader2 } from "lucide-react";
 
 export default function VeterinarianDashboard() {
-  const [user, setUser] = useState<any>(null);
+  const [bookings, setBookings] = useState<any[]>([]);
+  const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      const userData = await getUser();
-      setUser(userData);
-      setLoading(false);
+    const fetchData = async () => {
+      try {
+        const appointmentsData = await getMyAppointments();
+        if (appointmentsData.success) {
+          setBookings(appointmentsData.data || []);
+        }
+
+        const profileData = await getMySpecialistProfile();
+        if (profileData.success) {
+          setProfile(profileData.data);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
     };
-    fetchUser();
+    fetchData();
   }, []);
 
   if (loading) {
@@ -41,18 +51,29 @@ export default function VeterinarianDashboard() {
     );
   }
 
+  const todayAppointments = bookings.filter(b => {
+    const bookingDate = new Date(b.appointmentDate).toDateString();
+    return bookingDate === new Date().toDateString();
+  }).length;
+
   const stats = [
-    { label: "Today's Appointments", value: "8", icon: Calendar, color: "text-blue-500", bg: "bg-blue-500/10" },
-    { label: "Total Consultations", value: "142", icon: Stethoscope, color: "text-green-brand", bg: "bg-green-brand/10" },
-    { label: "Active Patients", value: "24", icon: Users, color: "text-purple-500", bg: "bg-purple-500/10" },
-    { label: "Avg. Rating", value: "4.9", icon: Star, color: "text-gold", bg: "bg-gold/10" },
+    { label: "Today's Appointments", value: todayAppointments.toString(), icon: Calendar, color: "text-blue-500", bg: "bg-blue-500/10" },
+    { label: "Total Consultations", value: bookings.length.toString(), icon: Stethoscope, color: "text-green-brand", bg: "bg-green-brand/10" },
+    { label: "Active Patients", value: bookings.filter(b => b.status === "ACCEPTED").length.toString(), icon: Users, color: "text-purple-500", bg: "bg-purple-500/10" },
+    { label: "Avg. Rating", value: profile?.rating || "4.9", icon: Star, color: "text-gold", bg: "bg-gold/10" },
   ];
 
-  const upcomingAppointments = [
-    { id: 1, patient: "Md. Abdul Karim", animal: "Cattle (Brahma)", time: "10:30 AM", type: "Online", status: "Upcoming" },
-    { id: 2, patient: "Rahima Khatun", animal: "Goat (Black Bengal)", time: "11:45 AM", type: "On-site", status: "Upcoming" },
-    { id: 3, patient: "Sujon Ahmed", animal: "Poultry Farm", time: "02:15 PM", type: "Online", status: "Upcoming" },
-  ];
+  const upcomingAppointments = bookings
+    .filter(b => b.status === "ACCEPTED" && new Date(b.appointmentDate) > new Date())
+    .slice(0, 3)
+    .map(b => ({
+      id: b.id,
+      patient: b.farmer?.name,
+      animal: "Consultation",
+      time: new Date(b.appointmentDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      type: "Online",
+      status: b.status
+    }));
 
   return (
     <div className="space-y-10 pb-10">
@@ -99,114 +120,49 @@ export default function VeterinarianDashboard() {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-8">
-        {/* Appointments Table */}
-        <motion.div 
-           initial={{ opacity: 0, scale: 0.95 }}
-           animate={{ opacity: 1, scale: 1 }}
-           className="p-10 rounded-[40px] bg-white dark:bg-zinc-950 border border-border shadow-xl h-[550px] flex flex-col"
-        >
-          <div className="flex items-center justify-between mb-8 shrink-0">
-            <h3 className="text-2xl font-serif font-black text-foreground flex items-center gap-3">
-                <Calendar className="w-6 h-6 text-green-brand" />
-                Upcoming Appointments
-            </h3>
-            <button className="text-xs font-black text-green-brand uppercase tracking-widest hover:underline">View Schedule</button>
-          </div>
-          <div className="space-y-4 overflow-y-auto pr-2 custom-scrollbar">
-            {upcomingAppointments.map((apt, i) => (
-              <div key={apt.id} className="flex items-center justify-between p-6 rounded-[24px] bg-muted/30 hover:bg-muted/60 transition-all border border-transparent hover:border-green-brand/20 group">
-                <div className="flex items-center gap-5">
-                  <div className="w-14 h-14 rounded-2xl bg-white dark:bg-zinc-900 border border-border flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
-                    {apt.type === "Online" ? "💻" : "🏥"}
-                  </div>
+      {/* Upcoming Appointments */}
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-serif font-black text-foreground">Upcoming Consultations</h2>
+          <a href="/dashboard/veterinarian/appointments" className="flex items-center gap-1 text-green-brand font-bold text-sm hover:gap-2 transition-all">
+            View All <ChevronRight className="w-4 h-4" />
+          </a>
+        </div>
+
+        {upcomingAppointments.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {upcomingAppointments.map((apt, index) => (
+              <motion.div
+                key={apt.id}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: index * 0.1 }}
+                className="bg-card border border-border p-6 rounded-[32px] hover:shadow-xl transition-all"
+              >
+                <div className="flex items-start justify-between mb-4">
                   <div>
-                    <h4 className="font-bold text-foreground text-lg leading-none mb-1">{apt.patient}</h4>
-                    <p className="text-xs text-muted-foreground font-bold uppercase tracking-widest">
-                      {apt.animal} • {apt.time}
-                    </p>
+                    <h3 className="font-black text-foreground">{apt.patient}</h3>
+                    <p className="text-sm text-muted-foreground mt-1">{apt.animal}</p>
                   </div>
-                </div>
-                <div className="flex flex-col items-end gap-2">
-                  <span className={`px-4 py-1 rounded-full text-[10px] font-black tracking-widest ${
+                  <span className={`px-3 py-1 rounded-full text-[9px] font-black tracking-widest ${
                     apt.type === 'Online' ? 'bg-blue-500/10 text-blue-500' : 'bg-amber-500/10 text-amber-500'
                   }`}>
-                    {apt.type.toUpperCase()}
+                    {apt.type}
                   </span>
-                  <button className="p-2 rounded-xl bg-green-brand/10 text-green-brand hover:bg-green-brand hover:text-white transition-all">
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
                 </div>
-              </div>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Clock className="w-4 h-4 text-green-brand" />
+                  {apt.time}
+                </div>
+              </motion.div>
             ))}
           </div>
-        </motion.div>
-
-        {/* Profile Card / Quick Actions */}
-        <div className="space-y-8">
-           <motion.div 
-             initial={{ opacity: 0, x: 20 }}
-             animate={{ opacity: 1, x: 0 }}
-             className="p-10 rounded-[40px] bg-green-deep text-white shadow-2xl relative overflow-hidden"
-           >
-             <div className="absolute top-0 right-0 w-32 h-32 bg-green-brand/20 blur-[50px] rounded-full -translate-y-1/2 translate-x-1/2" />
-             
-             <div className="flex items-center gap-6 mb-8 relative z-10">
-                <div className="w-20 h-20 rounded-3xl bg-white/10 border-2 border-white/20 flex items-center justify-center text-3xl font-black">
-                   {user?.name?.charAt(0)}
-                </div>
-                <div>
-                   <h3 className="text-2xl font-serif font-black">{user?.name}</h3>
-                   <p className="text-green-brand font-bold text-xs uppercase tracking-widest">Certified Veterinarian</p>
-                </div>
-             </div>
-
-             <div className="space-y-4 relative z-10">
-                <div className="flex items-center gap-3 text-sm text-white/70">
-                   <CheckCircle2 className="w-5 h-5 text-green-brand" />
-                   Verified Specialist
-                </div>
-                <div className="flex items-center gap-3 text-sm text-white/70">
-                   <Clock className="w-5 h-5 text-green-brand" />
-                   Available for Emergencies
-                </div>
-                <div className="flex items-center gap-3 text-sm text-white/70">
-                   <MapPin className="w-5 h-5 text-green-brand" />
-                   Dhaka, Bangladesh
-                </div>
-             </div>
-
-             <button className="w-full mt-10 py-4 bg-white text-green-deep rounded-2xl font-black hover:bg-green-light transition-all active:scale-95">
-                Update Expert Profile
-             </button>
-           </motion.div>
-
-           {/* Quick Stats / Info */}
-           <div className="p-8 rounded-[40px] bg-white dark:bg-zinc-950 border border-border shadow-xl">
-              <h4 className="font-serif font-black text-xl mb-6 flex items-center gap-2">
-                 <AlertCircle className="w-5 h-5 text-gold" />
-                 Platform Alerts
-              </h4>
-              <div className="space-y-4">
-                 <div className="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/10 flex gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-500 shrink-0">
-                       <TrendingUp className="w-5 h-5" />
-                    </div>
-                    <p className="text-xs font-bold text-muted-foreground leading-relaxed">
-                       Farmer demand for <span className="text-foreground">Livestock Consultations</span> has increased by 15% this week.
-                    </p>
-                 </div>
-                 <div className="p-4 rounded-2xl bg-blue-500/5 border border-blue-500/10 flex gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500 shrink-0">
-                       <FileText className="w-5 h-5" />
-                    </div>
-                    <p className="text-xs font-bold text-muted-foreground leading-relaxed">
-                       New <span className="text-foreground">Animal Health Guidelines</span> published for cattle in flood-prone areas.
-                    </p>
-                 </div>
-              </div>
-           </div>
-        </div>
+        ) : (
+          <div className="p-12 text-center bg-card border border-border rounded-[32px]">
+            <Calendar className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
+            <p className="text-muted-foreground font-bold">No upcoming consultations scheduled</p>
+          </div>
+        )}
       </div>
     </div>
   );

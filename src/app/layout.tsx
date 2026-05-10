@@ -3,6 +3,7 @@ import "./globals.css";
 import { ThemeProvider } from "../components/theme-provider";
 import { Toaster } from "sonner";
 import type { Metadata } from "next";
+import QueryProvider from "@/providers/QueryProvider";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -54,7 +55,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange={false}
         >
-          {children}
+          <QueryProvider>
+            {children}
+          </QueryProvider>
           <Toaster position="top-right" richColors closeButton />
         </ThemeProvider>
       </body>
